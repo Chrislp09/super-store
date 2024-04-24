@@ -1,0 +1,23 @@
+[
+    {
+      "path": "/",
+      "component": "Home",
+      "title": "Inicio",
+      "exact": true
+    },
+    {
+      "path": "/store",
+      "title": "Bodega",
+      "component": "Store"
+    },
+    {
+      "path": "/about",
+      "title": "Nosotros",
+      "component": "About"
+    },
+    {
+      "path": "/contact",
+      "title": "Contacto",
+      "component": "Contact"
+    }
+]
