@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import defaultImage from '../../assets/images/no-image.png';
 
 const ItemProduct = ({ product }) => {
     const [data, setProduct] = useState({
@@ -19,7 +20,7 @@ const ItemProduct = ({ product }) => {
 
   return (
     <div className="product-card">
-      <img src={data.image} alt={data.title} />
+      <img src={data.image || defaultImage} alt={data.title} onError={(e) => { e.target.onerror = null; e.target.src = defaultImage }} />
       <h3>{truncatedTitle}</h3>
       {/* <p className="description">{truncatedDescription}</p> */}
       <div className="product-details">

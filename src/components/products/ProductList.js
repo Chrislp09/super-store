@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ItemProduct from './ItemProducts'; 
 
-const ProductsList = ({ data, count, setCount, btnMore, setBtnMore }) => {
+const ProductsList = ({ data, count, setCount, btnMore, setBtnMore, getProducts }) => {
   let titleBtn = btnMore? "Ver más": "Ver menos";
   if (data.length === 0) {
     return <div className='products-list'>
       <p className="empty-message">No hay productos por mostrar.</p>
-      <button className='btn-load-more' onClick={() => setCount(5)}>Volver a cargar</button>
+      <button className='btn-load-more' onClick={() => getProducts()}>Volver a cargar</button>
     </div>;
   }
 

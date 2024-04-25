@@ -18,7 +18,7 @@ const urlfy = (obj) =>
 class Api {
     async get(apiSrv, params) {
         let uriparams = params ? "?" + urlfy(params) : '';
-        console.log(env,'ENV =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
+        console.log(env,params,'ENV GET =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {
@@ -60,6 +60,7 @@ class Api {
 
     async delete(apiSrv, params) {
         let uriparams = params ? params : '';
+        console.log(env,'ENV DELETE =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {
@@ -102,6 +103,7 @@ class Api {
 
     async getParams(apiSrv, params) {
         let uriparams = params ? params : '';
+        console.log(env,'ENV GET PARAMS =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {

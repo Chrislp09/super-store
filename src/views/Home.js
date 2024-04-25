@@ -13,7 +13,7 @@ const Home = ({ title, showLoader }) => {
   const viewData = async() => {
     showLoader(true);
     let getLimit = count > 0? {limit: count.toString()}: {};
-    let res = await getAll(config.apiStoreAll, getLimit);
+    let res = await getAll(getLimit);
     if(res.code === 200) {
       if(count > res.data.length && data.length <= res.data.length) {
         alert('Ya no hay mas productos por ver')
@@ -42,6 +42,7 @@ const Home = ({ title, showLoader }) => {
           setCount={setCount}
           btnMore={btnMore}
           setBtnMore={setBtnMore}
+          getProducts={viewData}
         />
       </div>
     </>

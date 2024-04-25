@@ -11,7 +11,7 @@ const Store = ({showLoader}) => {
   }, [])
   
   const headers = [
-    { key: 'id', label: 'id' },
+    { key: 'id', label: 'Id' },
     { key: 'name', label: 'Nombre' },
     { key: 'category', label: 'Categoria' },
     { key: 'price', label: 'Precio' },
@@ -31,11 +31,12 @@ const Store = ({showLoader}) => {
     if(data.code === 200) {
       if(data.data.length > 0) {
         const newArray = data.data.map((item) => {
+          let currencyprice = process.env.REACT_APP_CURRENCY + (item?.price? item?.price: "0.00");
           const nuevoObjeto = {
             id: item?.id || "",
             name: item?.title || "",
             category: item?.category || "",
-            price: item?.price || "",
+            price: currencyprice || "",
             stock: item?.rating.count || ""
           }
           return nuevoObjeto
