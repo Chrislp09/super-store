@@ -139,7 +139,7 @@ body {
 
 .product-card {
   width: 250px;
-  min-height: calc(25vh - 60px);
+  height: calc(62vh - 60px);
   margin: 20px;
   padding: 10px;
   border: 1px solid #ccc;

@@ -10,8 +10,8 @@ const ItemProduct = ({ product }) => {
         rating: product?.rating?.rate || "",
         count: product?.rating?.count || "",
     })
-    const truncatedTitle = data.title.length > 60
-    ? `${data.title.slice(0, 60)}...`
+    const truncatedTitle = data.title.length > 40
+    ? `${data.title.slice(0, 40)}...`
     : data.title;
     const truncatedDescription = data.description.length > 130
     ? `${data.description.slice(0, 130)}...`
