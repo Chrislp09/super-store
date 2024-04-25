@@ -4,7 +4,10 @@ import ItemProduct from './ItemProducts';
 const ProductsList = ({ data, count, setCount, btnMore, setBtnMore }) => {
   let titleBtn = btnMore? "Ver más": "Ver menos";
   if (data.length === 0) {
-    return <p className="empty-message">No hay productos por mostrar.</p>;
+    return <div className='products-list'>
+      <p className="empty-message">No hay productos por mostrar.</p>
+      <button className='btn-load-more' onClick={() => setCount(5)}>Volver a cargar</button>
+    </div>;
   }
 
   const moreLess = () => {

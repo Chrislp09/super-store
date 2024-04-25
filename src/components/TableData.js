@@ -27,21 +27,20 @@ const Table = ({ headers, data, actions }) => {
                 </tr>
             </thead>
             <tbody>
-                {data.length === 0 ? (
-                <tr>
-                    <td colSpan={headers.length} className="no-data-message">
-                    No hay datos que mostrar
-                    </td>
-                </tr>
-                ) : (
-                data.map((item, index) => (
+                {data.length > 0 && 
+                  data.map((item, index) => (
                     <tr key={index}>
                     {headers.map((header, index) => renderCell(item, header))}
                     </tr>
-                ))
-                )}
+                  ))
+                }
             </tbody>
         </table>
+        {data.length === 0 &&
+          <div className='no-data-table'>
+            <p>No hay datos que mostrar</p>
+          </div>
+        }
     </>
   );
 };
