@@ -9,13 +9,14 @@ const Home = ({ title, showLoader }) => {
   const [data, setData] = useState([]);
   const [count, setCount] = useState(5);
   const [btnMore, setBtnMore] = useState(true);
+  const cantidadMore = 5;
 
   const viewData = async() => {
     showLoader(true);
     let getLimit = count > 0? {limit: count.toString()}: {};
     let res = await getAll(getLimit);
     if(res.code === 200) {
-      if(count > res.data.length && data.length <= res.data.length) {
+      if(count > res.data.length && data.length >= res.data.length) {
         alert('Ya no hay mas productos por ver')
         setCount(res.data.length); 
         setBtnMore(false); 
@@ -43,6 +44,7 @@ const Home = ({ title, showLoader }) => {
           btnMore={btnMore}
           setBtnMore={setBtnMore}
           getProducts={viewData}
+          cantidadMore={cantidadMore}
         />
       </div>
     </>

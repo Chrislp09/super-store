@@ -1,5 +1,5 @@
 const config = {
-    env: "dev",
+    env: "local",
     dev: {
         apiRoot: process.env.REACT_APP_CONNECT_DEV
     },
@@ -7,7 +7,7 @@ const config = {
         apiRoot: process.env.REACT_APP_CONNECT_LOCAL
     },
     //LISTADO DE ENDOINTS API
-    apiStoreAll: "/products",
+    apiSrvStoreProduct: "/products",
 };
 
 export default config;

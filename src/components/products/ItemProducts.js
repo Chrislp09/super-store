@@ -6,10 +6,10 @@ const ItemProduct = ({ product }) => {
         title: product?.title || "",
         image: product?.image || "",
         description: product?.description || "",
-        price: product?.price || "",
+        price: product?.price || "0.00",
         category: product?.category || "",
-        rating: product?.rating?.rate || "",
-        count: product?.rating?.count || "",
+        rating: product?.rating?.rate || "0.0",
+        count: product?.rating?.count || "0",
     })
     const truncatedTitle = data.title.length > 60
     ? `${data.title.slice(0, 60)}...`
@@ -18,9 +18,18 @@ const ItemProduct = ({ product }) => {
     ? `${data.description.slice(0, 130)}...`
     : data.description;
 
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = defaultImage;
+  };
+
   return (
     <div className="product-card">
-      <img src={data.image || defaultImage} alt={data.title} onError={(e) => { e.target.onerror = null; e.target.src = defaultImage }} />
+      <img 
+          src={data.image || defaultImage} 
+          alt={data.title} 
+          onError={handleImageError} 
+      />
       <h3>{truncatedTitle}</h3>
       {/* <p className="description">{truncatedDescription}</p> */}
       <div className="product-details">
