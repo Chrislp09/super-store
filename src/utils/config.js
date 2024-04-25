@@ -1,5 +1,5 @@
 const config = {
-    env: "local",
+    env: "dev",
     dev: {
         apiRoot: process.env.REACT_APP_CONNECT_DEV
     },
