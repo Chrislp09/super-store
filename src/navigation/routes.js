@@ -6,6 +6,7 @@ import Contact from '../views/Contact';
 import About from '../views/About';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Store from '../views/Store';
+import DataManagement from '../views/DataManagement';
 
 const AppRoutes = ({showLoader}) => {
   const location = useLocation();
@@ -14,8 +15,10 @@ const AppRoutes = ({showLoader}) => {
     switch (componentName) {
       case 'Home':
         return <Home title={title} showLoader={showLoader} />;
-      case 'Store':
-        return <Store title={title} showLoader={showLoader} />;
+      /* case 'Store':
+        return <Store title={title} showLoader={showLoader} />; */
+      case 'DataManagement':
+        return <DataManagement title={title} showLoader={showLoader} />;
       case 'About':
         return <About title={title} showLoader={showLoader} />;
       case 'Contact':

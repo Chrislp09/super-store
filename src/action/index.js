@@ -25,3 +25,8 @@ export const updateProduct = async(id, params) => {
     let res = await api.put(`${Config.apiSrvStoreProduct}/${id}`, params);
     return res;
 }
+
+export const postUploadXlxs = async(params) => {
+    let res = await api.post(`${Config.apiSrvUploadXlsx}`, params);
+    return res;
+}

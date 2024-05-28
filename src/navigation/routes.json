@@ -1,14 +1,19 @@
 [
     {
+      "path": "icon",
+      "component": "",
+      "title": "logo"
+    },
+    {
       "path": "/",
       "component": "Home",
       "title": "Inicio",
       "exact": true
     },
     {
-      "path": "/store",
-      "title": "Bodega",
-      "component": "Store"
+      "path": "/DataManagement",
+      "title": "Gestión de Datos",
+      "component": "DataManagement"
     },
     {
       "path": "/about",

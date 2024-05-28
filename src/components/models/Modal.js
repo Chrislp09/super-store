@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Modal = ({ isOpen, onClose, children, onAction, titleAction }) => {
+const Modal = ({ btn, isOpen, onClose, children, onAction, titleAction }) => {
   if (!isOpen) return null;
 
   return (
@@ -8,7 +8,7 @@ const Modal = ({ isOpen, onClose, children, onAction, titleAction }) => {
       <div className="modal">
         {children}
         <div className='modal-btn-container'>
-            <button className="modal-close-btn mdl-two" onClick={onClose}>Cerrar</button>
+            {<button className="modal-close-btn mdl-two" onClick={onClose}>Cerrar</button>}
             {onAction && <button className="modal-close-btn mdl-one" onClick={onAction}>{titleAction || "Aceptar"}</button>}
         </div>
       </div>

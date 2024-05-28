@@ -192,6 +192,47 @@ class Api {
         }
     }
 
+    postUploadXlxs = async (apiSrv, file) => {
+        const formData = new FormData();
+        formData.append('xlsxFile', file);
+    
+        try {
+            const response = Promise.race([
+                fetch(`${apiRoot}${apiSrv}`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    redirect: 'follow',
+                    body: formData
+                }),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                )
+            ]);
+    
+            if (!response.ok) {
+                return { message: "No se logró obtener respuesta del servidor", code: response?.status || 500 }
+            }
+
+            if (response.status === 200) {
+                return compiledata(response);
+            } else {
+                objResponse.code = response?.status || 500;
+                objResponse.message = "No se logró obtener respuesta del servidor";
+                return objResponse;
+            }
+        } catch (error) {
+            objResponse.code = error?.status || 500;
+            objResponse.message = "No se logró obtener respuesta del servidor";
+            return objResponse;
+        }
+    }
+
     async put(apiSrv, data) {
         console.log(env, 'ENV PUT =======', `${apiRoot}${apiSrv}`, 'METHOD PUT ----------------------------------------------------------------');
         try {
