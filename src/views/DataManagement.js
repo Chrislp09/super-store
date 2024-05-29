@@ -1,173 +1,331 @@
 import React, { useEffect, useState } from 'react';
-import { createProduct, deleteProduct, getAll, getUniqueProduct, updateProduct } from '../action';
+import { createProduct, createRegister, deleteProduct, deleteRegister, getAllDatos, getUniqueProduct, getUniqueRegister, update, updateRegister, updateRegisterRegister } from '../action';
 import Header from '../components/Header';
-import AddEditProductModal from '../components/models/AddEditProductModal';
+import AddEditGestorModal from '../components/models/AddEditGestorModal';
 import UploadDataArchiveModal from '../components/models/UploadDataArchiveModal';
 import ViewProductModal from '../components/models/ViewProductoModal';
+import ViewRegisterModal from '../components/models/ViewRegisterModal';
 import Table from '../components/TableData';
 import config from '../utils/config';
 
-const DataManagement = ({showLoader}) => {
-  const [product, setProduct] = useState([]);
-  const [dataProduct, setDataProduct] = useState(null);
-  const [isModalOpenProduct, setIsModalOpenProduct] = useState(false);
-  const [isModalAddOpenProduct, setIsModalAddOpenProduct] = useState(false);
-  const [isModalEditOpenProduct, setIsModalEditOpenProduct] = useState(false);
+const DataManagement = ({ showLoader }) => {
+  const [data, setData] = useState([]);
+  const [dataRegister, setDataRegister] = useState(null);
+  const [isModalOpenRegister, setIsModalOpenRegister] = useState(false);
+  const [isModalAddOpenRegister, setIsModalAddOpenRegister] = useState(false);
+  const [isModalEditOpenRegister, setIsModalEditOpenRegister] = useState(false);
+  const [isUpload, setIsUpload] = useState(false);
   const [isModalUpload, setIsModalUpload] = useState(false);
-  const [csvFile, setCsvFile] = useState(null);
-
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalRegister, setTotalRegister] = useState(0);
+  const [gender, setGender] = useState('');
+  const [maritalStatus, setMaritalStatus] = useState('');
+  const [validationType, setValidationType] = useState('');
+  const [age, setAge] = useState('');
+  const [catalogoGenero, setCatalogoGenero] = useState([
+    {value: "Male", text:"Masculino"},
+    {value: "Female", text:"Femenino"},
+    {value: "Unspecified", text:"No especificado"}
+  ]);
+  const [catalogoEstadoMarital, setCatalogoEstadoMarital] = useState([
+    {value: "Single", text:"Soltero"},
+    {value: "Married", text:"Casado"},
+    {value: "In_Relationship", text:"En una relación"},
+  ]);
+  const [catalogoValidacion, setCatalogoValidacion] = useState([
+    {text: "Mayor o igual", value:"mayor_igual"},
+    {text: "Menor o igual", value:"menor_igual"},
+    {text: "Igual", value:"igual"},
+  ]);
 
   useEffect(() => {
-    getAllProduct();
-  }, [])
-  
+    getAllDatosList(limit, currentPage);
+    if(isUpload) {
+      setIsUpload(false)
+    }
+  }, [limit, currentPage, isUpload]);
+
   const headers = [
-    { key: 'id', label: 'Id' },
-    { key: 'name', label: 'Nombre' },
-    { key: 'category', label: 'Categoria' },
-    { key: 'price', label: 'Precio' },
-    { key: 'stock', label: 'Stock' },
+    { key: 'num', label: '' },
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'apellido', label: 'Apellido' },
+    { key: 'genero', label: 'Género' },
+    { key: 'edad_cumplida', label: 'Edad Cumplida' },
+    { key: 'estado_marital', label: 'Estado Marital' },
     { key: 'actions', label: 'Acciones' },
   ];
-  
+
   const actions = [
-    { class:"action-btn ver", label: 'Ver', onClick: (item) => {getProduct(item.id); } },
-    { class:"action-btn edit", label: 'Editar', onClick: (item) => {getProduct(item.id, true);} },
-    { class:"action-btn delete", label: 'Eliminar', onClick: (item) => {deleteUniqueProduct(item.id); } },
+    { class: "action-btn ver", label: 'Ver', onClick: (item) => { getRegister(item._id); } },
+    { class: "action-btn edit", label: 'Editar', onClick: (item) => { getRegister(item._id, true); } },
+    { class: "action-btn delete", label: 'Eliminar', onClick: (item) => { deleteUniqueProduct(item._id); } },
   ];
 
-  const getAllProduct = async () => {
+  const getAllDatosList = async (limit, page, type) => {
     showLoader(true);
-    let data = await getAll();
-    if(data.code === 200) {
-      if(data.data.length > 0) {
-        const newArray = data.data.map((item, index) => {
-          let currencyprice = process.env.REACT_APP_CURRENCY + (item?.price? item?.price: "0.00");
-          const nuevoObjeto = {
-            id: (config.env === 'dev'? item?.id : item?._id) || index+1,
-            name: item?.title || "",
-            category: item?.category || "",
-            price: currencyprice || "",
-            stock: item?.rating.count || 0
-          }
-          return nuevoObjeto
-        })
-        setProduct(newArray);
-      }
-    } else {
-      alert(data.message)
-    }
-    showLoader(false);
-  }
-
-  const deleteUniqueProduct = async(id) => {
-    showLoader(true);
-    let data = await deleteProduct(id.toString());
-    if(data.code === 200) {
-      alert(`Se elimino correctamente el producto ${data.data.title}`);
-      if(config.env === 'dev') {
-        const deleteProduct = product.filter(item => item.id !== data.data.id);
-        setProduct(deleteProduct);
+    let data = await getAllDatos({
+      limit: limit?.toString() || "0", 
+      page: page?.toString() || "0",
+      nombre: "",
+      apellido: "",
+      genero: gender || "",
+      estado_marital: maritalStatus || "",
+      edad_min: "", 
+      edad_max: "",
+      validar_edad: validationType || "",
+      edad_cumplida: age || "",
+    });
+    if (data.code === 200 && data.data.data.length > 0) {
+      const startNumber = (page - 1) * limit + 1;
+      const newDataList = data.data.data.map((v, i) => {
+        let number = startNumber + i;
+        const nuevoObjeto = {
+          ...v,
+          num: number
+        };
+        return nuevoObjeto;
+      });
+      if(type) {
+        showLoader(false);
+        return newDataList;
       } else {
-        getAllProduct();
+        setData(newDataList);
+        setTotalPages(data.data.totalPages);
+        setTotalRegister(data.data.total);
       }
     } else {
-      alert(data.message || "No se pudo borrar este elemento")
+      setData([]);
+      console.log(data.message);
     }
     showLoader(false);
-  }
+  };
 
-  const getProduct = async(id, edit) => {
+  const deleteUniqueProduct = async (id) => {
     showLoader(true);
-    let data = await getUniqueProduct(id.toString());
-    if(data.code === 200) {
-      setDataProduct(data.data);
-      if(edit) {
-        setIsModalEditOpenProduct(true);
+    let data = await deleteRegister(id.toString());
+    if (data.code === 200) {
+      alert(`Se eliminó correctamente el registro`);
+      getAllDatosList(limit, currentPage);
+    } else {
+      alert(data.message || "No se pudo borrar este elemento");
+    }
+    showLoader(false);
+  };
+
+  const getRegister = async (id, edit) => {
+    showLoader(true);
+    let data = await getUniqueRegister(id.toString());
+    if (data.code === 200) {
+      setDataRegister(data.data);
+      if (edit) {
+        setIsModalEditOpenRegister(true);
       } else {
-        setIsModalOpenProduct(true);
+        setIsModalOpenRegister(true);
       }
     } else {
-      alert(data.message || "No se pudo obtener datos del producto")
+      alert(data.message || "No se pudo obtener datos del producto");
     }
     showLoader(false);
-  }
+  };
 
-  const updateDataProduct = async(form, id) => {
+  const updateDataGestor = async (form, id) => {
     showLoader(true);
-    let data = await updateProduct(id.toString(), form);
-    if(data.code === 200) {
-      setDataProduct(null);
-      setIsModalEditOpenProduct(false);
-      alert(`Se actualizaron los datos del producto "${form.title || ""}"`);
-      getAllProduct();
+    let data = await updateRegister(id.toString(), form);
+    if (data.code === 200) {
+      setDataRegister(null);
+      setIsModalEditOpenRegister(false);
+      alert(`Se actualizo el registro ${form.nombre || ""} ${form.apellido || ""}`);
+      getAllDatosList(limit, currentPage);
     } else {
       alert(data.message || "No se pudo actualizar los datos del producto");
     }
     showLoader(false);
-  }
+  };
 
-  const createDataProduct = async(form) => {
+  const createDataRegister = async (form) => {
     showLoader(true);
-    let data = await createProduct(form);
-    if(data.code === 200 || 201) {
-      setIsModalAddOpenProduct(false);
-      alert(`Se creo el producto "${form.title || ""}"`);
-      getAllProduct();
+    let data = await createRegister(form);
+    if (data.code === 200 || data.code === 201) {
+      setIsModalAddOpenRegister(false);
+      alert(`Se guardo el registro ${form.nombre || ""} ${form.apellido || ""}`);
+      getAllDatosList(limit, currentPage);
     } else {
       alert(data.message || "No se pudo crear el producto");
     }
     showLoader(false);
+  };
+
+  const generateCSV = async() => {
+    if(data?.length > 0) {
+      let dataGenerate = await getAllDatosList(0, 0, 'csv');
+      const headers = ['Nombre', 'Apellido', 'Género', 'Edad_Cumplida', 'Estado'];
+      const rows = dataGenerate.map(item => [
+        item.nombre || "N",
+        item.apellido || "N",
+        item.genero || "N",
+        item.edad_cumplida || "N",
+        item.estado_marital || "N"
+      ]);
+    
+      let csvContent = '\uFEFF'; 
+      csvContent += headers.join(',') + '\n';
+      rows.forEach(row => {
+        csvContent += row.join(',') + '\n';
+      });
+    
+      const now = new Date();
+      const formattedDate = now.toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+      const fileName = `REPORTE_DATOS_GESTOR_${formattedDate}.csv`;
+    
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert("No hay datos para generar el reporte");
+    }
+  };
+
+  const aplicarFiltros = () => {
+    setTotalPages(1);
+    setCurrentPage(1);
+    setTotalRegister(0);
+    getAllDatosList(limit, 1);
   }
 
-  
+  const limpiarFiltros = async() => {
+    if(gender || age || validationType || maritalStatus) {
+      setGender('');
+      setMaritalStatus('');
+      setValidationType('');
+      setAge('');
+      showLoader(true);
+      let data = await getAllDatos({
+        limit: limit?.toString() || "0", 
+        page: "1",
+        nombre: "",
+        apellido: "",
+        genero: "",
+        estado_marital: "",
+        edad_min: "", 
+        edad_max: "",
+        validar_edad: "",
+        edad_cumplida: "",
+      });
+      if (data.code === 200 && data.data.data.length > 0) {
+        const startNumber = (1 - 1) * limit + 1;
+        const newDataList = data.data.data.map((v, i) => {
+          let number = startNumber + i;
+          const nuevoObjeto = {
+            ...v,
+            num: number
+          };
+          return nuevoObjeto;
+        });
+        setData(newDataList);
+        setTotalPages(data.data.totalPages);
+        setTotalRegister(data.data.total);
+      } else {
+        setData([]);
+        console.log(data.message);
+      }
+      showLoader(false);
+    }
+  }
 
   return (
     <>
-      <Header 
-          title={"Gestión de Datos"}
-          description={
-            `Este apartado es una herramienta que te ayuda a trabajar con tus 
+      <Header
+        title={"Gestión de Datos"}
+        description={
+          `Este apartado es una herramienta que te ayuda a trabajar con tus 
             archivos de datos de una manera fácil y rápida. Puedes cargar archivos CSV, 
             que son archivos de datos comunes, y luego filtrarlos para encontrar 
-            la información que necesitas. Por ejemplo, podrías filtrar por fechas, 
-            nombres o cualquier otro criterio que te interese. Una vez que encuentres 
+            la información que necesitas. Una vez que encuentres 
             los datos que buscas, se mostrarán en una tabla para que los puedas ver y 
-            entender fácilmente."`}
-        />
-      <div className='btn-add-container'>
-        <button onClick={() => {setIsModalAddOpenProduct(true)}} className='btn-add'>Agregar</button>
-        <button onClick={() => {setIsModalUpload(true)}} className='btn-add-csv'>Subir archivo</button>
-      </div>
-      <div style={{marginTop: '2%', marginBottom: '5%'}}>
-        <Table headers={headers} data={product} actions={actions} />
-      </div>
-      <ViewProductModal 
-        title="Detalle del Producto"
-        action2={(e) => {setIsModalOpenProduct(false); setDataProduct(null)}}
-        setIsModalOpen={setIsModalOpenProduct}
-        isModalOpen={isModalOpenProduct}
-        product={dataProduct}
+            entender fácilmente.`
+        }
       />
-      <UploadDataArchiveModal 
+      <div className='btn-add-container'>
+        <button onClick={() => { setIsModalAddOpenRegister(true) }} className='btn-add'>Agregar</button>
+        <button onClick={() => { setIsModalUpload(true) }} className='btn-add'>Carga masiva</button>
+        <button onClick={generateCSV} className='btn-add-csv'>Generar CSV</button>
+      </div>
+      <div style={{ marginTop: '2%', marginBottom: '5%' }}>
+        <div className='filter-container'>
+          <label htmlFor="genderSelect">Género:</label>
+          <select id="genderSelect" value={gender} onChange={(e) => setGender(e.target.value)}>
+            <option value="">Seleccione...</option>
+            {catalogoGenero.map((gender, index) => (
+                <option key={index} value={gender.value}>{gender.text}</option>
+            ))}
+          </select>
+          <label htmlFor="maritalStatusSelect">Estado Marital:</label>
+          <select id="maritalStatusSelect" value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)}>
+            <option value="">Seleccione...</option>
+            {catalogoEstadoMarital.map((status, index) => (
+                <option key={index} value={status.value}>{status.text}</option>
+            ))}
+          </select>
+          <label htmlFor="ageInput">Edad:</label>
+          <input id="ageInput" type="number" min="19" value={age} onChange={(e) => setAge(e.target.value)} />
+          <label htmlFor="validationTypeSelect">Tipo de Validación:</label>
+          <select id="validationTypeSelect" value={validationType} onChange={(e) => setValidationType(e.target.value)}>
+            <option value="">Seleccione...</option>
+            {catalogoValidacion.map((count, index) => (
+                <option key={index} value={count.value}>{count.text}</option>
+            ))}
+          </select>
+          <button onClick={aplicarFiltros} className='btn-add-csv'>Aplicar Filtros</button>
+          <button onClick={limpiarFiltros} className='btn-add-csv'>Limpiar</button>
+        </div>
+        <Table
+          key="tbl-gestor"
+          headers={headers}
+          data={data}
+          actions={actions}
+          limit={limit}
+          setLimit={setLimit}
+          getAllDatosList={getAllDatosList}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalRegister={totalRegister}
+        />
+      </div>
+      <ViewRegisterModal
+        title="Detalle del Registro"
+        action2={() => { setIsModalOpenRegister(false); setDataRegister(null) }}
+        setIsModalOpen={setIsModalOpenRegister}
+        isModalOpen={isModalOpenRegister}
+        register={dataRegister}
+      />
+      <UploadDataArchiveModal
         title="Carga masiva de datos"
         setIsModalOpen={setIsModalUpload}
         isModalOpen={isModalUpload}
+        setIsUpload={setIsUpload}
       />
-      <AddEditProductModal 
-        title="Crear Producto"
-        action1={createDataProduct}
-        action2={(e) => {setIsModalAddOpenProduct(false); setDataProduct(null)}}
-        setIsModalOpen={setIsModalAddOpenProduct}
-        isModalOpen={isModalAddOpenProduct}
+      <AddEditGestorModal
+        title="Añadir Registro"
+        action1={createDataRegister}
+        action2={() => { setIsModalAddOpenRegister(false); setDataRegister(null) }}
+        setIsModalOpen={setIsModalAddOpenRegister}
+        isModalOpen={isModalAddOpenRegister}
       />
-      <AddEditProductModal 
-        title={"Editar Producto - "+(config.env === 'dev'? dataProduct?.id : dataProduct?._id )}
-        action1={updateDataProduct}
-        action2={(e) => {setIsModalEditOpenProduct(false); setDataProduct(null)}}
-        setIsModalOpen={setIsModalEditOpenProduct}
-        isModalOpen={isModalEditOpenProduct}
-        product={dataProduct}
+      <AddEditGestorModal
+        title={"Editar Registro - " +  dataRegister?._id}
+        action1={updateDataGestor}
+        action2={() => { setIsModalEditOpenRegister(false); setDataRegister(null) }}
+        setIsModalOpen={setIsModalEditOpenRegister}
+        isModalOpen={isModalEditOpenRegister}
+        gestor={dataRegister}
       />
     </>
   )

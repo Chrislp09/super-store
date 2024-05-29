@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const Table = ({ headers, data, actions }) => {
+const Table = ({ key, headers, data, actions, getAllDatosList, limit, setLimit, totalPages, totalRegister, currentPage, setCurrentPage }) => {
+
+  useEffect(() => {
+    getAllDatosList(limit, currentPage);
+  }, [currentPage, limit]);
+
   const renderCell = (item, header) => {
     if (header.key === 'actions') {
       return (
@@ -16,9 +21,17 @@ const Table = ({ headers, data, actions }) => {
     return <td>{item[header.key]}</td>;
   };
 
+  const handleNextPage = () => {
+    setCurrentPage(prevPage => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(prevPage => Math.max(prevPage - 1, 1));
+  };
+
   return (
     <>
-        <table>
+      <table>
             <thead>
                 <tr>
                 {headers.map((header, index) => (
@@ -26,7 +39,7 @@ const Table = ({ headers, data, actions }) => {
                 ))}
                 </tr>
             </thead>
-            <tbody>
+            <tbody key={key}>
                 {data.length > 0 && 
                   data.map((item, index) => (
                     <tr key={index}>
@@ -36,7 +49,16 @@ const Table = ({ headers, data, actions }) => {
                 }
             </tbody>
         </table>
-        {data.length === 0 &&
+        {data.length > 0 ?
+          <div className="pagination-container">
+            <button className="pagination-button" onClick={handlePrevPage} disabled={currentPage === 1}>
+              Anterior
+            </button>
+            <span className="pagination-info">{`Página ${currentPage} de ${totalPages} - Total registros ${totalRegister}`}</span>
+            <button className="pagination-button" onClick={handleNextPage} disabled={currentPage === totalPages}>
+              Siguiente
+            </button>
+          </div> :
           <div className='no-data-table'>
             <p>No hay datos que mostrar</p>
           </div>

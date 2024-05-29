@@ -192,20 +192,19 @@ class Api {
         }
     }
 
-    postUploadXlxs = async (apiSrv, file) => {
+    async postUploadXlxs(apiSrv, file) {
         const formData = new FormData();
-        formData.append('xlsxFile', file);
+        formData.append('file', file);
     
         try {
-            const response = Promise.race([
+            const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}`, {
                     method: 'POST',
                     mode: 'cors',
                     cache: 'no-cache',
                     credentials: 'same-origin',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Origin': '*', // No necesitas 'Content-Type' para FormData
                     },
                     redirect: 'follow',
                     body: formData
@@ -215,10 +214,11 @@ class Api {
                 )
             ]);
     
+            // Aquí puedes manejar la respuesta como lo necesites
             if (!response.ok) {
                 return { message: "No se logró obtener respuesta del servidor", code: response?.status || 500 }
             }
-
+    
             if (response.status === 200) {
                 return compiledata(response);
             } else {
@@ -231,7 +231,7 @@ class Api {
             objResponse.message = "No se logró obtener respuesta del servidor";
             return objResponse;
         }
-    }
+    };
 
     async put(apiSrv, data) {
         console.log(env, 'ENV PUT =======', `${apiRoot}${apiSrv}`, 'METHOD PUT ----------------------------------------------------------------');

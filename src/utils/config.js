@@ -8,7 +8,14 @@ const config = {
     },
     //LISTADO DE ENDOINTS API
     apiSrvStoreProduct: "/products",
-    apiSrvUploadXlsx: "/upload",
+    apiSrvUploadXlsx: "/gestor/uploadXlsx",
+    apiSrvGetDataList: "/gestor/dataList",
+    apiSrvGetCatalog: "/gestor/catalog",
+    apiSrvPostCreateRegiter: "/gestor/guardarRegistro",
+    apiSrvPutRegiter: "/gestor/editarRegistro",
+    apiSrvDeleteRegiter: "/gestor/eliminarRegistro",
+    apiSrvGetRegiter: "/gestor/obtenerRegistro"
+
 };
 
 export default config;

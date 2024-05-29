@@ -3,8 +3,10 @@ import Modal from './Modal';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 import { postUploadXlxs } from '../../action';
+import api from '../../utils/api';
+import config from '../../utils/config';
 
-const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, action1, action2, onCreateOrUpdate, product }) => {
+const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [errors, setErrors] = useState([]); 
@@ -60,27 +62,11 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, action1, a
         return validationErrors;
     };
 
-    const uploadXLSX = async (file) => {
-        try {
-            let res = await postUploadXlxs(file);
-    
-            if (res.status === 200) {
-                console.log("Archivo subido exitosamente");
-            } else {
-                console.log("Hubo un error al subir el archivo");
-            }
-            setIsLoading(false);
-        } catch (error) {
-            console.error('Error al subir el archivo:', error);
-            setIsLoading(false);
-        }
-    }
-
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (selectedFile) {
             setIsLoading(true);
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
 
@@ -97,8 +83,17 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, action1, a
                 const validationErrors = validateData(jsonData);
 
                 if (validationErrors.length === 0) {
-                    uploadXLSX(jsonData);
-                    setErrors([]);
+                    const res = await postUploadXlxs(selectedFile)
+                    if (res.code === 200) {
+                        alert(res.message||"Archivo subido exitosamente");
+                        setErrors([]);
+                        setSelectedFile(null);
+                        setIsModalOpen(false);
+                        setIsUpload(true);
+                    } else {
+                        alert(res.message || "Hubo un error al subir el archivo");
+                    }
+                    setIsLoading(false);
                 } else {
                     setIsLoading(false);
                     setErrors(validationErrors);
@@ -126,7 +121,7 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, action1, a
       <div className="product-modal-content-form">
             <h3>Información sobre el archivo xls:</h3>
             <p>
-                El archivo CSV que vas a cargar debe cumplir con ciertas especificaciones para que los datos se guarden correctamente en la base de datos. A continuación se detallan las condiciones que debe cumplir el archivo:
+                El archivo XLSX que se a cargará debe cumplir con ciertas especificaciones para que los datos se guarden correctamente en la base de datos. A continuación se detallan las condiciones que debe cumplir el archivo:
             </p>
             <ul>
                 <li>El archivo debe ser un archivo de Excel (.xls) con el formato adecuado.</li>
@@ -152,6 +147,7 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, action1, a
                     type="file"
                     id="csvFile"
                     accept=".xlsx"
+                    name="file"
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
                 />
