@@ -8,7 +8,11 @@ export const getAll = async(params) => {
 
 export const getCatalog = async(params) => {
     let res = await api.get(Config.apiSrvGetCatalog, params);
-    return res;
+    let data = [];
+    if(res.code === 200 && res?.data?.length > 0) {
+        data = res.data;
+    }
+    return data;
 }
 
 export const getAllDatos = async(params) => {

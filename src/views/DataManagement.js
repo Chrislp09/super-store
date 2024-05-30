@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createProduct, createRegister, deleteProduct, deleteRegister, getAllDatos, getUniqueProduct, getUniqueRegister, update, updateRegister, updateRegisterRegister } from '../action';
+import { createProduct, createRegister, deleteProduct, deleteRegister, getAllDatos, getCatalog, getUniqueProduct, getUniqueRegister, update, updateRegister, updateRegisterRegister } from '../action';
 import Header from '../components/Header';
 import AddEditGestorModal from '../components/models/AddEditGestorModal';
 import UploadDataArchiveModal from '../components/models/UploadDataArchiveModal';
@@ -8,7 +8,7 @@ import ViewRegisterModal from '../components/models/ViewRegisterModal';
 import Table from '../components/TableData';
 import config from '../utils/config';
 
-const DataManagement = ({ showLoader }) => {
+const DataManagement = ({ showLoader, showToast }) => {
   const [data, setData] = useState([]);
   const [dataRegister, setDataRegister] = useState(null);
   const [isModalOpenRegister, setIsModalOpenRegister] = useState(false);
@@ -41,6 +41,9 @@ const DataManagement = ({ showLoader }) => {
   ]);
 
   useEffect(() => {
+    getCatalogos("estado_marital");
+    getCatalogos("genero");
+    getCatalogos("validacion_edad");
     getAllDatosList(limit, currentPage);
     if(isUpload) {
       setIsUpload(false)
@@ -53,7 +56,7 @@ const DataManagement = ({ showLoader }) => {
     { key: 'apellido', label: 'Apellido' },
     { key: 'genero', label: 'Género' },
     { key: 'edad_cumplida', label: 'Edad Cumplida' },
-    { key: 'estado_marital', label: 'Estado Marital' },
+    { key: 'estado_marital', label: 'Estado Civil' },
     { key: 'actions', label: 'Acciones' },
   ];
 
@@ -62,6 +65,26 @@ const DataManagement = ({ showLoader }) => {
     { class: "action-btn edit", label: 'Editar', onClick: (item) => { getRegister(item._id, true); } },
     { class: "action-btn delete", label: 'Eliminar', onClick: (item) => { deleteUniqueProduct(item._id); } },
   ];
+
+  const getCatalogos = async(params) => {
+    let res = await getCatalog({
+        "field":params
+    });
+
+    switch (params) {
+      case 'genero':
+        setCatalogoGenero(res?.length > 0? res: []);
+        break;
+      case 'estado_marital':
+        setCatalogoEstadoMarital(res?.length > 0? res: []);
+          break;
+      case 'validacion_edad':
+        setCatalogoValidacion(res?.length > 0? res: []);
+        break;
+      default:
+          return;
+    }
+}
 
   const getAllDatosList = async (limit, page, type) => {
     showLoader(true);
@@ -106,10 +129,10 @@ const DataManagement = ({ showLoader }) => {
     showLoader(true);
     let data = await deleteRegister(id.toString());
     if (data.code === 200) {
-      alert(`Se eliminó correctamente el registro`);
+      showToast(`Se eliminó correctamente el registro`, 'success', 3000);
       getAllDatosList(limit, currentPage);
     } else {
-      alert(data.message || "No se pudo borrar este elemento");
+      showToast(data.message || "No se pudo borrar este elemento", 'error', 3000);
     }
     showLoader(false);
   };
@@ -125,7 +148,7 @@ const DataManagement = ({ showLoader }) => {
         setIsModalOpenRegister(true);
       }
     } else {
-      alert(data.message || "No se pudo obtener datos del producto");
+      showToast(data.message || "No se pudo obtener datos del producto", 'error', 3000);
     }
     showLoader(false);
   };
@@ -136,10 +159,10 @@ const DataManagement = ({ showLoader }) => {
     if (data.code === 200) {
       setDataRegister(null);
       setIsModalEditOpenRegister(false);
-      alert(`Se actualizo el registro ${form.nombre || ""} ${form.apellido || ""}`);
+      showToast(`Se actualizo el registro ${form.nombre || ""} ${form.apellido || ""}`, 'success', 3000);
       getAllDatosList(limit, currentPage);
     } else {
-      alert(data.message || "No se pudo actualizar los datos del producto");
+      showToast(data.message || "No se pudo actualizar los datos del producto", 'error', 3000);
     }
     showLoader(false);
   };
@@ -149,46 +172,51 @@ const DataManagement = ({ showLoader }) => {
     let data = await createRegister(form);
     if (data.code === 200 || data.code === 201) {
       setIsModalAddOpenRegister(false);
-      alert(`Se guardo el registro ${form.nombre || ""} ${form.apellido || ""}`);
+      showToast(`Se guardo el registro ${form.nombre || ""} ${form.apellido || ""}`, 'success', 3000);
       getAllDatosList(limit, currentPage);
     } else {
-      alert(data.message || "No se pudo crear el producto");
+      showToast(data.message || "No se pudo crear el producto", 'error', 3000);
     }
     showLoader(false);
   };
 
   const generateCSV = async() => {
     if(data?.length > 0) {
-      let dataGenerate = await getAllDatosList(0, 0, 'csv');
-      const headers = ['Nombre', 'Apellido', 'Género', 'Edad_Cumplida', 'Estado'];
-      const rows = dataGenerate.map(item => [
-        item.nombre || "N",
-        item.apellido || "N",
-        item.genero || "N",
-        item.edad_cumplida || "N",
-        item.estado_marital || "N"
-      ]);
-    
-      let csvContent = '\uFEFF'; 
-      csvContent += headers.join(',') + '\n';
-      rows.forEach(row => {
-        csvContent += row.join(',') + '\n';
-      });
-    
-      const now = new Date();
-      const formattedDate = now.toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
-      const fileName = `REPORTE_DATOS_GESTOR_${formattedDate}.csv`;
-    
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        let dataGenerate = await getAllDatosList(0, 0, 'csv');
+        const headers = ['Nombre', 'Apellido', 'Género', 'Edad_Cumplida', 'Estado'];
+        const rows = dataGenerate.map(item => [
+          item.nombre || "N",
+          item.apellido || "N",
+          item.genero || "N",
+          item.edad_cumplida || "N",
+          item.estado_marital || "N"
+        ]);
+      
+        let csvContent = '\uFEFF'; 
+        csvContent += headers.join(',') + '\n';
+        rows.forEach(row => {
+          csvContent += row.join(',') + '\n';
+        });
+      
+        const now = new Date();
+        const formattedDate = now.toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+        const fileName = `REPORTE_DATOS_GESTOR_${formattedDate}.csv`;
+      
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast(`El reporte ${fileName} se genero correctamente`, 'success', 5000);
+      }catch(e) {
+        showToast(`Hubo un error al tratar de generar el reporte`, 'error', 3000);
+      }
     } else {
-      alert("No hay datos para generar el reporte");
+      showToast("No hay datos para generar el reporte", 'error', 3000);
     }
   };
 
@@ -262,14 +290,14 @@ const DataManagement = ({ showLoader }) => {
           <label htmlFor="genderSelect">Género:</label>
           <select id="genderSelect" value={gender} onChange={(e) => setGender(e.target.value)}>
             <option value="">Seleccione...</option>
-            {catalogoGenero.map((gender, index) => (
+            {catalogoGenero.length > 0 && catalogoGenero.map((gender, index) => (
                 <option key={index} value={gender.value}>{gender.text}</option>
             ))}
           </select>
-          <label htmlFor="maritalStatusSelect">Estado Marital:</label>
+          <label htmlFor="maritalStatusSelect">Estado Civil:</label>
           <select id="maritalStatusSelect" value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)}>
             <option value="">Seleccione...</option>
-            {catalogoEstadoMarital.map((status, index) => (
+            {catalogoEstadoMarital.length > 0 && catalogoEstadoMarital.map((status, index) => (
                 <option key={index} value={status.value}>{status.text}</option>
             ))}
           </select>
@@ -278,7 +306,7 @@ const DataManagement = ({ showLoader }) => {
           <label htmlFor="validationTypeSelect">Tipo de Validación:</label>
           <select id="validationTypeSelect" value={validationType} onChange={(e) => setValidationType(e.target.value)}>
             <option value="">Seleccione...</option>
-            {catalogoValidacion.map((count, index) => (
+            {catalogoValidacion.length > 0 && catalogoValidacion.map((count, index) => (
                 <option key={index} value={count.value}>{count.text}</option>
             ))}
           </select>
@@ -311,6 +339,7 @@ const DataManagement = ({ showLoader }) => {
         setIsModalOpen={setIsModalUpload}
         isModalOpen={isModalUpload}
         setIsUpload={setIsUpload}
+        showToast={showToast}
       />
       <AddEditGestorModal
         title="Añadir Registro"
@@ -318,6 +347,8 @@ const DataManagement = ({ showLoader }) => {
         action2={() => { setIsModalAddOpenRegister(false); setDataRegister(null) }}
         setIsModalOpen={setIsModalAddOpenRegister}
         isModalOpen={isModalAddOpenRegister}
+        catalogoEstadoMarital={catalogoEstadoMarital}
+        catalogoGeneros={catalogoGenero}
       />
       <AddEditGestorModal
         title={"Editar Registro - " +  dataRegister?._id}
@@ -326,6 +357,8 @@ const DataManagement = ({ showLoader }) => {
         setIsModalOpen={setIsModalEditOpenRegister}
         isModalOpen={isModalEditOpenRegister}
         gestor={dataRegister}
+        catalogoEstadoMarital={catalogoEstadoMarital}
+        catalogoGeneros={catalogoGenero}
       />
     </>
   )

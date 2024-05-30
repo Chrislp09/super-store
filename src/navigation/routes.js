@@ -8,21 +8,21 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Store from '../views/Store';
 import DataManagement from '../views/DataManagement';
 
-const AppRoutes = ({showLoader}) => {
+const AppRoutes = ({showLoader, showToast }) => {
   const location = useLocation();
 
   const getComponent = (componentName, title) => {
     switch (componentName) {
       case 'Home':
-        return <Home title={title} showLoader={showLoader} />;
+        return <Home title={title} showLoader={showLoader} showToast={showToast} />;
       /* case 'Store':
         return <Store title={title} showLoader={showLoader} />; */
       case 'DataManagement':
-        return <DataManagement title={title} showLoader={showLoader} />;
+        return <DataManagement title={title} showLoader={showLoader} showToast={showToast} />;
       case 'About':
-        return <About title={title} showLoader={showLoader} />;
+        return <About title={title} showLoader={showLoader} showToast={showToast} />;
       case 'Contact':
-        return <Contact title={title} showLoader={showLoader} />;
+        return <Contact title={title} showLoader={showLoader} showToast={showToast} />;
       default:
         return null;
     }

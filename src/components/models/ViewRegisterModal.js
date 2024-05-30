@@ -20,10 +20,6 @@ const ViewRegisterModal = ({ title, action1, action2, register, isModalOpen, set
     });
   }, [isModalOpen]);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <Modal isOpen={isModalOpen} onClose={action2}>
       <h2>{title}</h2>
@@ -32,8 +28,8 @@ const ViewRegisterModal = ({ title, action1, action2, register, isModalOpen, set
           <p><strong>Nombre:</strong> {data.nombre}</p>
           <p><strong>Apellido:</strong> {data.apellido}</p>
           <p><strong>Género:</strong> {data.genero}</p>
-          <p><strong>Edad cumplida:</strong> {data.edad_cumplida}</p>
-          <p><strong>Estado marital:</strong> {data.estado_marital}</p>
+          <p><strong>Edad Cumplida:</strong> {data.edad_cumplida}</p>
+          <p><strong>Estado Civil:</strong> {data.estado_marital}</p>
         </div>
       </div>
     </Modal>

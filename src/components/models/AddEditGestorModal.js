@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getCatalog } from '../../action';
 import Modal from './Modal';
 
-const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, action2, gestor, maritalStatusOptions, genderOptions }) => {
+const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, action2, gestor, catalogoEstadoMarital, catalogoGeneros }) => {
     const [formData, setFormData] = useState({
         nombre: gestor?.nombre || '',
         apellido: gestor?.apellido || '',
@@ -19,17 +18,6 @@ const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, actio
         genero: ''
     });
 
-    const [catalogoGenero, setCatalogoGenero] = useState([
-        "Male",
-        "Female",
-        "Unspecified",
-    ]);
-    const [catalogoEstadoMarital, setCatalogoEstadoMarital] = useState([
-        "Single",
-        "Married",
-        "In_Relationship"
-    ]);
-
     useEffect(() => {
         setFormData({
             nombre: gestor?.nombre || '',
@@ -45,27 +33,9 @@ const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, actio
             estado_marital: '',
             genero: ''
         });
-        getCatalogEstadoMarital();
-        getCatalogGenero();
     }, [isModalOpen, gestor]);
 
-    const getCatalogGenero = async() => {
-        let res = await getCatalog({
-            "field":"genero"
-        });
-        if(res.code === 200 && res?.data?.length > 2) {
-            //setCatalogoGenero(res.data);
-        }
-    }
-
-    const getCatalogEstadoMarital = async() => {
-        let res = await getCatalog({
-            "field":"estado_marital"
-        });
-        if(res.code === 200 && res?.data?.length > 2) {
-            //setCatalogoEstadoMarital(res.data);
-        }
-    }
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -123,11 +93,11 @@ const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, actio
                     {errors.edad_cumplida && <span className="error-message">{errors.edad_cumplida}</span>}
                 </label>
                 <label>
-                    Estado Marital:
+                    Estado Civil:
                     <select name="estado_marital" value={formData.estado_marital} onChange={handleChange}>
                         <option value="0">Seleccione...</option>
-                        {catalogoEstadoMarital.map((status, index) => (
-                            <option key={index} value={status}>{status}</option>
+                        {catalogoEstadoMarital?.length > 0  && catalogoEstadoMarital.map((status, index) => (
+                            <option key={index} value={status.value}>{status.text}</option>
                         ))}
                     </select>
                     {errors.estado_marital && <span className="error-message">{errors.estado_marital}</span>}
@@ -136,8 +106,8 @@ const AddEditGestorModal = ({ title, isModalOpen, setIsModalOpen, action1, actio
                     Género:
                     <select name="genero" value={formData.genero} onChange={handleChange}>
                         <option value="">Seleccione...</option>
-                        {catalogoGenero.map((gender, index) => (
-                            <option key={index} value={gender}>{gender}</option>
+                        {catalogoGeneros?.length > 0 && catalogoGeneros.map((gender, index) => (
+                            <option key={index} value={gender.value}>{gender.text}</option>
                         ))}
                     </select>
                     {errors.genero && <span className="error-message">{errors.genero}</span>}

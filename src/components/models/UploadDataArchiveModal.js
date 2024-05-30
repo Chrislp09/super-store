@@ -6,7 +6,7 @@ import { postUploadXlxs } from '../../action';
 import api from '../../utils/api';
 import config from '../../utils/config';
 
-const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUpload }) => {
+const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUpload, showToast }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [errors, setErrors] = useState([]); 
@@ -31,7 +31,7 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUploa
             if (index === 0) {
                 const [edad, genero, estado, nombre, apellido] = row;
                 if (edad !== 'edad_cumplida' || genero !== 'genero' || estado !== 'estado_marital' ||
-                    (nombre && nombre !== 'Nombre') || (apellido && apellido !== 'Apellido')) {
+                    (nombre && nombre !== 'nombre') || (apellido && apellido !== 'apellido')) {
                     validationErrors.push({ row: 1, column: 'Headers', message: 'Los encabezados no son correctos' });
                 }
             } else {
@@ -42,7 +42,7 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUploa
                 }
     
                 if (genero && genero !== 'Male' && genero !== 'Female' && genero !== 'Unspecified') {
-                    validationErrors.push({ row: index + 1, column: 'genero', message: 'El género debe ser "M" o "F"' });
+                    validationErrors.push({ row: index + 1, column: 'genero', message: 'El género debe ser "Male" o "Female"' });
                 }
     
                 const validStates = ['Married', 'Single', 'In_Relationship'];
@@ -85,13 +85,13 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUploa
                 if (validationErrors.length === 0) {
                     const res = await postUploadXlxs(selectedFile)
                     if (res.code === 200) {
-                        alert(res.message||"Archivo subido exitosamente");
+                        showToast(res.message||"Archivo subido exitosamente", 'success', 3000);
                         setErrors([]);
                         setSelectedFile(null);
                         setIsModalOpen(false);
                         setIsUpload(true);
                     } else {
-                        alert(res.message || "Hubo un error al subir el archivo");
+                        showToast(res.message || "Hubo un error al subir el archivo", 'error', 3000);
                     }
                     setIsLoading(false);
                 } else {
@@ -137,6 +137,9 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUploa
             </ul>
             <p>
                 Asegúrate de que tu archivo cumpla con estos requisitos antes de cargarlo. Si el archivo no cumple con estas especificaciones, es posible que los datos no se guarden correctamente en la base de datos.
+            </p>
+            <p>
+                Puedes descargar un archivo de ejemplo <a href="/xlsx/CARGA_MASIVA_PLANTILLA.xlsx" download>CARGA_MASIVA_PLANTILLA.xlsx</a>.
             </p>
         </div>
       <div className="">
