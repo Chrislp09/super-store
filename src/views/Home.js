@@ -12,7 +12,7 @@ const Home = ({ title, showLoader }) => {
   const [btnMore, setBtnMore] = useState(true);
   const cantidadMore = 5;
 
-  const viewData = async() => {
+  /* const viewData = async() => {
     showLoader(true);
     let getLimit = count > 0? {limit: count.toString()}: {};
     let res = await getAll(getLimit);
@@ -30,7 +30,7 @@ const Home = ({ title, showLoader }) => {
 
   useEffect(() => {
     viewData();
-  }, [count])
+  }, [count]) */
   return (
     <>
       <Header 
