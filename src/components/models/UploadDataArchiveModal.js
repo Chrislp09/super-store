@@ -37,7 +37,7 @@ const UploadDataArchiveModal = ({ title, isModalOpen, setIsModalOpen, setIsUploa
             } else {
                 const [edad, genero, estado, nombre, apellido] = row;
     
-                if (isNaN(edad) || edad < 0) {
+                if (isNaN(edad) || edad < 18) {
                     validationErrors.push({ row: index + 1, column: 'edad_cumplida', message: 'La edad debe ser un número mayor o igual a 18' });
                 }
     
