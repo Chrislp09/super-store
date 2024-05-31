@@ -30,7 +30,7 @@ const compiledata = async(data) => {
 class Api {
     async get(apiSrv, params) {
         let uriparams = params ? "?" + urlfy(params) : '';
-        console.log(env,params,'ENV GET =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
+        console.log(env,params,'ENV GET =======',`${apiRoot}${apiSrv}${uriparams}`, process.env.REACT_APP_TIMEOUT,'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {
@@ -45,7 +45,7 @@ class Api {
                     redirect: 'follow'
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
 
@@ -69,7 +69,7 @@ class Api {
 
     async delete(apiSrv, params) {
         let uriparams = params ? params : '';
-        console.log(env,'ENV DELETE =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
+        console.log(env,'ENV DELETE =======',`${apiRoot}${apiSrv}${uriparams}`, process.env.REACT_APP_TIMEOUT,'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {
@@ -84,7 +84,7 @@ class Api {
                     redirect: 'follow'
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
             
@@ -112,7 +112,7 @@ class Api {
 
     async getParams(apiSrv, params) {
         let uriparams = params ? params : '';
-        console.log(env,'ENV GET PARAMS =======',`${apiRoot}${apiSrv}${uriparams}`, 'METHOD GET ----------------------------------------------------------------')
+        console.log(env,'ENV GET PARAMS =======',`${apiRoot}${apiSrv}${uriparams}`, process.env.REACT_APP_TIMEOUT,'METHOD GET ----------------------------------------------------------------')
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}${uriparams}`, {
@@ -127,7 +127,7 @@ class Api {
                     redirect: 'follow'
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
             
@@ -154,7 +154,7 @@ class Api {
     }
 
     async post(apiSrv, data) {
-        console.log(env, 'ENV POST =======', `${apiRoot}${apiSrv}`, 'METHOD POST ----------------------------------------------------------------');
+        console.log(env, 'ENV POST =======', `${apiRoot}${apiSrv}`, process.env.REACT_APP_TIMEOUT,'METHOD POST ----------------------------------------------------------------');
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}`, {
@@ -170,7 +170,7 @@ class Api {
                     body: JSON.stringify(data)
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
 
@@ -210,7 +210,7 @@ class Api {
                     body: formData
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
     
@@ -234,7 +234,7 @@ class Api {
     };
 
     async put(apiSrv, data) {
-        console.log(env, 'ENV PUT =======', `${apiRoot}${apiSrv}`, 'METHOD PUT ----------------------------------------------------------------');
+        console.log(env, 'ENV PUT =======', `${apiRoot}${apiSrv}`, process.env.REACT_APP_TIMEOUT,'METHOD PUT ----------------------------------------------------------------');
         try {
             const response = await Promise.race([
                 fetch(`${apiRoot}${apiSrv}`, {
@@ -250,7 +250,7 @@ class Api {
                     body: JSON.stringify(data)
                 }),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                    setTimeout(() => reject(new Error('Timeout')), process.env.REACT_APP_TIMEOUT)
                 )
             ]);
 
