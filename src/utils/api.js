@@ -17,14 +17,7 @@ const urlfy = (obj) =>
         .join('&');
 
 const compiledata = async(data) => {
-    if(config.env === 'local') {
-        return await data.json();
-    } else {
-        return  {
-            code: data.status,
-            data: await data.json(),    
-        };
-    }
+    return await data.json();
 }
 
 class Api {
